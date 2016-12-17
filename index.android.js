@@ -1,34 +1,48 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- * @flow
- */
-
 import React, { Component } from 'react';
-import {
-  AppRegistry,
-  StyleSheet,
-  Text,
-  View
-} from 'react-native';
+import { AppRegistry, StyleSheet, Text, View } from 'react-native';
+
+function logWithTime(message) {
+  console.log(`${Date.now()} - ${message}`);
+}
 
 export default class HangingFetch extends Component {
+
+  state = {
+    hasLoaded: false,
+  };
+
+  onPressButton() {
+    logWithTime('Pressed');
+
+    this.setState({ hasLoaded: false });
+
+    fetch('https://api.github.com/users')
+      .then((response) => response.json()) // Comment out this line to fix the delay.
+      .then(() => this.onFetch())
+      .catch(() => this.onFetch());
+  }
+
+  onFetch() {
+    logWithTime('Fetched');
+
+    this.setState({ hasLoaded: true });
+  }
+
   render() {
+    logWithTime('Render');
+
     return (
       <View style={styles.container}>
-        <Text style={styles.welcome}>
-          Welcome to React Native!
+        <Text style={[styles.instructions, styles.button]} onPress={() => this.onPressButton()}>
+          Fetch!
         </Text>
         <Text style={styles.instructions}>
-          To get started, edit index.android.js
-        </Text>
-        <Text style={styles.instructions}>
-          Double tap R on your keyboard to reload,{'\n'}
-          Shake or press menu button for dev menu
+          Request has loaded? {this.state.hasLoaded ? 'Yes' : 'No'}.
         </Text>
       </View>
     );
   }
+
 }
 
 const styles = StyleSheet.create({
@@ -38,15 +52,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#F5FCFF',
   },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
-  },
   instructions: {
     textAlign: 'center',
     color: '#333333',
     marginBottom: 5,
+  },
+  button: {
+    fontSize: 18,
   },
 });
 
